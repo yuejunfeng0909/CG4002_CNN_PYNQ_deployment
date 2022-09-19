@@ -23,17 +23,17 @@ class CNNDriver(DefaultIP):
         
     bindto = ["xilinx.com:hls:cnn_action_detection:1.0"] 
     
-    def inference(self, window):
+    def inference(self, window: np.int16):
         """
         Feed a window of data into the model and get the current prediction
-        and confidence by the model.
-        
+        and confidence by the model. The sliding window must have window size
+        of 15 and window stride of 5.
         
         A window consists of 15 data, each 6 channels.
         The window format should be:
         d1c1, d1c2, d1c3, ..., d1c6, d2c1, d2c2,... ,d15c5, d15c6
         whereas d1c6 refers to the value of the 6th channel of the 1st data
-        All data must be in np.float32 format.
+        All data must be in np.int16 format.
         
         The function saves the raw(before softmax) outputs to self.raw_outputs
         
@@ -51,8 +51,19 @@ class CNNDriver(DefaultIP):
         | 4 | Idle       |
         +---+------------+
         
+        Usually the inference can only give high confidence(e.g. >80%) after receiving 
+        10 windows of data. 
+        
+        Sample usage:
+        data=[d1, d2, ..., d150]
+        predicted_class, confidence = IP.inference(data[0:15])
+        predicted_class, confidence = IP.inference(data[5:20])
+        predicted_class, confidence = IP.inference(data[10:25])
+        ............
+        predicted_class, confidence = IP.inference(data[135:150])
+        
         Parameters:
-        window: flattened input of 15 data, each 6 channels, in np.float32 format 
+        window: flattened input of 15 data, each 6 channels, in np.int16 format 
         
         Returns:
         predicted_class(int) : Index of the predicted type of action
@@ -61,7 +72,7 @@ class CNNDriver(DefaultIP):
         """
         
         # preparing input for the IP
-        self.data_in[:] = window[:]
+        self.data_in[:] = np.float32(window[:]/4096.0)
         self.register_map.function_select=0
         
         # start inferencing
@@ -94,6 +105,9 @@ class CNNDriver(DefaultIP):
             print(f"time took for reading raw result = {time() - start_time}")
     
     def resetBuffer(self):
+        '''
+        To reset the buffer in the network and get ready for new inference.
+        '''
         self.register_map.function_select=2
         if self.debug:
             start_time = time()
