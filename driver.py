@@ -117,22 +117,22 @@ class CNNDriver(DefaultIP):
             print(f"time took for resetting buffer = {time() - start_time}")
             
     def setCNNWeights(self, new_weights):
-        setWeightsOrBias(new_weights, 3)
+        self.setWeightsOrBias(new_weights, 3)
     
     def setCNNBias(self, new_weights):
-        setWeightsOrBias(new_weights, 4)
+        self.setWeightsOrBias(new_weights, 4)
         
     def setDenseWeights(self, new_weights):
-        setWeightsOrBias(new_weights, 5)
+        self.setWeightsOrBias(new_weights, 5)
         
     def setDenseBias(self, new_weights):
-        setWeightsOrBias(new_weights, 6)
+        self.setWeightsOrBias(new_weights, 6)
             
     def setWeightsOrBias(self, new_weights, weights_or_bias):
-        buffer = pynq.allocate(shape=data.shape, dtype=data.dtype)
+        buffer = pynq.allocate(shape=new_weights.shape, dtype=np.float32)
         buffer[:] = new_weights[:]
         self.register_map.weights_and_bias = buffer.device_address
-        self.register_map.function_select=3
+        self.register_map.function_select=weights_or_bias
         self.register_map.CTRL.AP_START=1
         while(self.register_map.CTRL.AP_DONE == 0):pass
         buffer.freebuffer()
