@@ -60,7 +60,7 @@ class CNNDriver(DefaultIP):
         """
         
         # preparing input for the IP
-        self.input = np.float32(data[:]/4096.0)
+        self.input[:] = np.float32(data[:]/4096.0)
         
         # start inferencing
         self.register_map.function_select=0
