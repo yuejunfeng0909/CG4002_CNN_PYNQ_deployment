@@ -72,7 +72,7 @@ class CNNDriver(DefaultIP):
         if self.debug:
             print(f"time took for inference = {time() - start_time}")
         
-        predicted_class = int(self.register_map.result_out)
+        predicted_class = np.argmax(self.raw_outputs)
         confidence = max(softmax(self.raw_outputs))
         return predicted_class, confidence
     
