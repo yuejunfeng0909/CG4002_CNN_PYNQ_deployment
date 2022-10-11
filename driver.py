@@ -10,8 +10,8 @@ class CNNDriver(DefaultIP):
     def __init__(self, description):
         super().__init__(description=description)
         
-        self.data_in = pynq.allocate(shape=(6,), dtype=np.float32)
-        self.register_map.data_in=self.data_in.device_address
+        self.input = pynq.allocate(shape=(6,), dtype=np.float32)
+        self.register_map.data = self.input.device_address
         
         self.raw_outputs = pynq.allocate(shape=(4,), dtype=np.float32)
         self.register_map.raw_output=self.raw_outputs.device_address
@@ -20,7 +20,7 @@ class CNNDriver(DefaultIP):
         
     bindto = ["xilinx.com:hls:cnn_action_detection:1.0"] 
     
-    def inference(self, data: np.int32):
+    def inference(self, data):
         """
         Feed data into the model and get the current prediction
         and confidence by the model.
@@ -60,8 +60,7 @@ class CNNDriver(DefaultIP):
         """
         
         # preparing input for the IP
-        self.data_in[:] = np.float32(data[:]/4096.0)
-        self.register_map.function_select=0
+        self.input = np.float32(data[:]/4096.0)
         
         # start inferencing
         self.register_map.function_select=0
