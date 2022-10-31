@@ -81,11 +81,12 @@ class CNNDriver(DefaultIP):
         # Confidence
         predicted_class = np.argmax(self.raw_outputs)
         confidence = max(softmax(self.raw_outputs))
-        if confidence < self.threshold:
-            return -1
         
         if self.debug:
-            print(f"confidence={confidence}, time took for inference={time() - start_time}")
+            print(f"player {user_number}, predicted={predicted_class}, confidence={confidence*100:.3f}%, time took for inference={(time() - start_time)*1000:.3f}ms")
+            
+        if confidence < self.threshold:
+            return -1
         return predicted_class
     
     def resetBuffer(self, user_number=0):
