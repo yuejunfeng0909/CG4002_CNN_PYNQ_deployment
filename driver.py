@@ -4,7 +4,7 @@ import numpy as np
 from time import time
 from typing import List
 
-THRESH = 0.8
+PRESET_THRESH = 0.8
 
 def Model(path):
     return Overlay(path).cnn_action_detection_0
@@ -18,10 +18,14 @@ class CNNDriver(DefaultIP):
         
         self.raw_outputs = pynq.allocate(shape=(4,), dtype=np.float32)
         self.register_map.raw_output=self.raw_outputs.device_address
+        self.threshold = PRESET_THRESH
         
         self.debug = False
         
     bindto = ["xilinx.com:hls:cnn_action_detection:1.0"] 
+    
+    def set_threshold(self, new_threshold):
+        self.threshold = new_threshold
     
     def inference(self, data: List[int], user_number=0):
         """
@@ -73,16 +77,15 @@ class CNNDriver(DefaultIP):
         start_time = time()
         self.register_map.CTRL.AP_START=1
         while(self.register_map.CTRL.AP_DONE == 0):pass # mostly immediate
-        if self.debug:
-            print(f"time took for inference = {time() - start_time}")
 
         # Confidence
         predicted_class = np.argmax(self.raw_outputs)
         confidence = max(softmax(self.raw_outputs))
-        if confidence < THRESH:
+        if confidence < self.threshold:
             return -1
-
-        print(f"FPGA Prediction: {["Shield", "Reload", "Grenade", "Logout"][predicted_class]}({confidence}), took {(time()-start_time)*1000}ms")
+        
+        if self.debug:
+            print(f"confidence={confidence}, time took for inference={time() - start_time}")
         return predicted_class
     
     def resetBuffer(self, user_number=0):
