@@ -4,7 +4,7 @@ import numpy as np
 from time import time
 from typing import List
 
-PRESET_THRESH = 0.8
+PRESET_THRESH = 0.95
 
 def Model(path):
     return Overlay(path).cnn_action_detection_0
@@ -20,7 +20,7 @@ class CNNDriver(DefaultIP):
         self.register_map.raw_output=self.raw_outputs.device_address
         self.threshold = PRESET_THRESH
         
-        self.debug = False
+        self.debug = True
         
     bindto = ["xilinx.com:hls:cnn_action_detection:1.0"] 
     
@@ -67,6 +67,8 @@ class CNNDriver(DefaultIP):
         confidence(float     : Confidence that the action belong to the predicted class
         
         """
+        if self.debug:
+            start_time = time()
         
         # preparing input for the IP
         self.input[:] = np.float32([i/4096.0 for i in data])
@@ -74,7 +76,6 @@ class CNNDriver(DefaultIP):
         # start inferencing
         self.register_map.function_select=0
         self.register_map.user_number = user_number
-        start_time = time()
         self.register_map.CTRL.AP_START=1
         while(self.register_map.CTRL.AP_DONE == 0):pass # mostly immediate
 
@@ -83,7 +84,7 @@ class CNNDriver(DefaultIP):
         confidence = max(softmax(self.raw_outputs))
         
         if self.debug:
-            print(f"player {user_number}, predicted={predicted_class}, confidence={confidence*100:.3f}%, time took for inference={(time() - start_time)*1000:.3f}ms")
+            print(f"player {user_number}, predicted={["Shield", "Reload", "Grenade", "Logout"][predicted_class]}, confidence={confidence*100:.3f}%, time took for inference={(time() - start_time)*1000:.3f}ms")
             
         if confidence < self.threshold:
             return -1
@@ -93,15 +94,17 @@ class CNNDriver(DefaultIP):
         '''
         To reset the buffer in the network and get ready for new inference.
         '''
-        self.register_map.function_select=1
-        self.register_map.user_number = user_number
         if self.debug:
             start_time = time()
+           
+        self.register_map.function_select=1
+        self.register_map.user_number = user_number
         self.register_map.CTRL.AP_START=1
         while(self.register_map.CTRL.AP_DONE == 0):pass
+        
         if self.debug:
             print(f"time took for resetting buffer = {time() - start_time}")
-            
+
     def setCNNWeights(self, new_weights):
         self.setWeightsOrBias(new_weights, 2)
     
