@@ -4,7 +4,7 @@ import numpy as np
 from time import time
 from typing import List
 
-PRESET_THRESH = 0.95
+PRESET_THRESH = 0.9
 class_labels = ["Shield", "Reload", "Grenade", "Logout", "Idle"]
 
 def Model(path):
