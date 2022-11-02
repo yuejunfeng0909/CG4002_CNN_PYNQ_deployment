@@ -5,6 +5,7 @@ from time import time
 from typing import List
 
 PRESET_THRESH = 0.95
+class_labels = ["Shield", "Reload", "Grenade", "Logout", "Idle"]
 
 def Model(path):
     return Overlay(path).cnn_action_detection_0
@@ -82,12 +83,14 @@ class CNNDriver(DefaultIP):
         # Confidence
         predicted_class = np.argmax(self.raw_outputs)
         confidence = max(softmax(self.raw_outputs))
-        
-        if self.debug:
-            print(f"player {user_number}, predicted={["Shield", "Reload", "Grenade", "Logout"][predicted_class]}, confidence={confidence*100:.3f}%, time took for inference={(time() - start_time)*1000:.3f}ms")
             
         if predicted_class == 4 or confidence < self.threshold:
+#         if confidence < self.threshold:
             return -1
+        
+        if self.debug:
+            print(f"player {user_number}, predicted={class_labels[predicted_class]}, confidence={confidence*100:.3f}%, time took for inference={(time() - start_time)*1000:.3f}ms")
+            
         return predicted_class
     
     def resetBuffer(self, user_number=0):
@@ -103,7 +106,7 @@ class CNNDriver(DefaultIP):
         while(self.register_map.CTRL.AP_DONE == 0):pass
         
         if self.debug:
-            print(f"time took for resetting buffer = {time() - start_time}")
+            print(f"time took for resetting FPGA buffer = {time() - start_time}")
 
     def setCNNWeights(self, new_weights):
         self.setWeightsOrBias(new_weights, 2)
