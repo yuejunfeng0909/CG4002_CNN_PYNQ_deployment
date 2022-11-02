@@ -67,6 +67,8 @@ class CNNDriver(DefaultIP):
         confidence(float     : Confidence that the action belong to the predicted class
         
         """
+        if self.debug:
+            start_time = time()
         
         # preparing input for the IP
         self.input[:] = np.float32([i/4096.0 for i in data])
@@ -74,7 +76,6 @@ class CNNDriver(DefaultIP):
         # start inferencing
         self.register_map.function_select=0
         self.register_map.user_number = user_number
-        start_time = time()
         self.register_map.CTRL.AP_START=1
         while(self.register_map.CTRL.AP_DONE == 0):pass # mostly immediate
 
@@ -93,15 +94,17 @@ class CNNDriver(DefaultIP):
         '''
         To reset the buffer in the network and get ready for new inference.
         '''
-        self.register_map.function_select=1
-        self.register_map.user_number = user_number
         if self.debug:
             start_time = time()
+           
+        self.register_map.function_select=1
+        self.register_map.user_number = user_number
         self.register_map.CTRL.AP_START=1
         while(self.register_map.CTRL.AP_DONE == 0):pass
+        
         if self.debug:
             print(f"time took for resetting buffer = {time() - start_time}")
-            
+
     def setCNNWeights(self, new_weights):
         self.setWeightsOrBias(new_weights, 2)
     
