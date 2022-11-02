@@ -16,7 +16,7 @@ class CNNDriver(DefaultIP):
         self.input = pynq.allocate(shape=(6,), dtype=np.float32)
         self.register_map.data = self.input.device_address
         
-        self.raw_outputs = pynq.allocate(shape=(4,), dtype=np.float32)
+        self.raw_outputs = pynq.allocate(shape=(5,), dtype=np.float32)
         self.register_map.raw_output=self.raw_outputs.device_address
         self.threshold = PRESET_THRESH
         
@@ -86,7 +86,7 @@ class CNNDriver(DefaultIP):
         if self.debug:
             print(f"player {user_number}, predicted={predicted_class}, confidence={confidence*100:.3f}%, time took for inference={(time() - start_time)*1000:.3f}ms")
             
-        if confidence < self.threshold:
+        if predicted_class == 4 or confidence < self.threshold:
             return -1
         return predicted_class
     
