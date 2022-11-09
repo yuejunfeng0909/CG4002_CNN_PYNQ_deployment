@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Nov  2 13:37:37 2022" VIVADOVERSION="2022.1">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Nov  9 01:43:17 2022" VIVADOVERSION="2022.1">
 
   <SYSTEMINFO ARCH="zynquplus" BOARD="avnet.com:ultra96v2:part0:1.2" DEVICE="xczu3eg" NAME="design_1" PACKAGE="sbva484" SPEEDGRADE="-1"/>
 
@@ -504,7 +504,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2112752375" FULLNAME="/cnn_action_detection_0" HWVERSION="1.0" INSTANCE="cnn_action_detection_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="cnn_action_detection" VLNV="xilinx.com:hls:cnn_action_detection:1.0">
+    <MODULE COREREVISION="2112761740" FULLNAME="/cnn_action_detection_0" HWVERSION="1.0" INSTANCE="cnn_action_detection_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="cnn_action_detection" VLNV="xilinx.com:hls:cnn_action_detection:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
