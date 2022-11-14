@@ -1,0 +1,1 @@
+This repository contains the hardware AI FPGA bitstream, the corresponding Python driver, the model parameters and some test code.
